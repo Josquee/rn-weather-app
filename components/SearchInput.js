@@ -7,7 +7,7 @@ const SearchInput = ({ value, setValue, onPress }) => {
   return (
     <TextInput style={styles.input}
                placeholder="Search any city"
-               placeholderTextColor="#fff"
+               placeholderTextColor={colors.white}
                autoCorrect={false}
                onChangeText={setValue}
                value={value}

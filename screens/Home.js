@@ -1,27 +1,21 @@
-import React, { useRef, useState } from 'react'
-import { Animated, ImageBackground, Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import React, { useState } from 'react'
+import { ImageBackground, Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
 import { useQuery } from 'react-query'
 
+import FadeInTop from '../components/FadeInTop'
 import ScreenLayout from '../components/ScreenLayout'
 import SearchInput from '../components/SearchInput'
 
 import colors from '../config/colors'
 import { fetchLocation, fetchWeather } from '../api/weather'
 import useTodayWeather from '../hooks/useTodayWeather'
-import fadeInTop from '../utils/fadeInTop'
 
 const Home = () => {
   const [location, setLocation] = useState('')
-  const fade = useRef(new Animated.Value(0)).current
-  const transformAnim = useRef(new Animated.Value(-30)).current
   const { data: id, refetch } = useQuery('locations', () => fetchLocation(location), { enabled: false })
   const cityId = id?.[0]?.woeid
 
-  const { data: weatherInfo } = useQuery(['weather', cityId], async () => {
-    const data = await fetchWeather(cityId)
-    fadeInTop(fade, transformAnim)
-    return data
-  }, { enabled: !!cityId })
+  const { data: weatherInfo } = useQuery(['weather', cityId], () => fetchWeather(cityId), { enabled: !!cityId })
 
   const weatherToday = useTodayWeather(weatherInfo)
 
@@ -32,11 +26,11 @@ const Home = () => {
         <ScreenLayout>
           <View style={styles.weatherInfo}>
             {weatherToday &&
-              <Animated.View style={[{ alignItems: 'center' }, { opacity: fade, translateY: transformAnim }]}>
+              <FadeInTop>
                 <Text style={styles.title}>{weatherInfo?.title}</Text>
                 <Text style={styles.subtitle}>{weatherToday?.weather_state_name}</Text>
                 <Text style={styles.title}>{Math.round(weatherToday?.the_temp)}°C</Text>
-              </Animated.View>}
+              </FadeInTop>}
           </View>
           <SearchInput onPress={refetch} value={location} setValue={setLocation} />
         </ScreenLayout>
